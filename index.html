@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laberinto Interactivo y Algoritmos de Búsqueda | Ciencia Callejera</title>
+  <meta name="description" content="Aplicación interactiva y educativa para jugar y visualizar algoritmos de búsqueda de caminos en laberintos: BFS, DFS, Dijkstra y Floyd-Warshall.">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+  <header>
+    <h1>Laberinto & Algoritmos de Búsqueda</h1>
+    <p>Explora el laberinto manualmente o visualiza cómo diferentes algoritmos computacionales descubren el camino hacia la meta paso a paso.</p>
+  </header>
+
+  <main class="app-container">
+    <!-- Panel del Canvas / Tablero -->
+    <section class="canvas-panel">
+      <div class="canvas-wrapper">
+        <canvas id="canvasLaberinto" width="775" height="775"></canvas>
+        
+        <!-- Overlay de Victoria -->
+        <div id="victoryOverlay" class="victory-overlay hidden">
+          <div class="victory-content">
+            <div class="victory-icon">🏆</div>
+            <h2>¡Laberinto completado!</h2>
+            <p>¡Felicitaciones! Has llegado a la meta con éxito.</p>
+            <div class="victory-stats">
+              <div class="stat-item">
+                <span class="stat-label">Movimientos</span>
+                <span id="victoryPasos" class="stat-value">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Tiempo</span>
+                <span id="victoryTiempo" class="stat-value">0s</span>
+              </div>
+            </div>
+            <button id="btnVictoriaReiniciar" class="btn btn-success" onclick="reiniciarJuego()" style="width: 100%;">
+              🔄 Jugar de nuevo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de estado debajo del canvas -->
+      <div class="canvas-statusbar">
+        <div class="status-badge">
+          <span id="statusIndicator" class="badge-dot"></span>
+          <span id="statusText">Listo para jugar</span>
+        </div>
+        <div>
+          Posición: <strong id="marcadorPosicion">(27, 0)</strong>
+        </div>
+      </div>
+
+      <!-- Leyenda de Colores -->
+      <div class="legend-bar">
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #10b981;"></span>
+          <span>Inicio (27,0)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #f59e0b;"></span>
+          <span>Meta (3,30)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #3b82f6;"></span>
+          <span>Jugador</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: rgba(56, 189, 248, 0.7);"></span>
+          <span>Visitado</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: rgba(168, 85, 247, 0.75);"></span>
+          <span>Frontera</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #22c55e;"></span>
+          <span>Camino Óptimo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel Lateral de Controles y Explicación -->
+    <aside class="sidebar-panel">
+      
+      <!-- Tarjeta 1: Modo Jugador -->
+      <div class="card" id="cardJugador">
+        <h2 class="card-title">🎮 Modo Manual (Jugador)</h2>
+        <div class="instructions-list">
+          <p>Mueve al personaje hasta la meta dorada utilizando:</p>
+          <p>
+            <span class="key-badge">▲</span> <span class="key-badge">▼</span> <span class="key-badge">◄</span> <span class="key-badge">►</span> Flechas o <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span>
+          </p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-card-label">Pasos dados</span>
+            <div id="marcadorPasos" class="metric-card-val">0</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-card-label">Tiempo</span>
+            <div id="marcadorTiempo" class="metric-card-val">0s</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <button id="btnReiniciarJuego" class="btn btn-outline" onclick="reiniciarJuego()" style="width: 100%;">
+            🔄 Reiniciar Posición
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjeta 2: Demostración de Algoritmos -->
+      <div class="card" id="cardAlgoritmos">
+        <h2 class="card-title">🤖 Algoritmos de Búsqueda</h2>
+        
+        <div class="btn-group">
+          <button id="btnBFS" class="btn btn-primary" onclick="ejecutarAlgoritmo('BFS')">
+            BFS
+          </button>
+          <button id="btnDFS" class="btn btn-primary" onclick="ejecutarAlgoritmo('DFS')">
+            DFS
+          </button>
+          <button id="btnDijkstra" class="btn btn-primary" onclick="ejecutarAlgoritmo('Dijkstra')">
+            Dijkstra
+          </button>
+          <button id="btnFloydWarshall" class="btn btn-primary" onclick="ejecutarAlgoritmo('Floyd-Warshall')">
+            Floyd-Warshall
+          </button>
+        </div>
+
+        <!-- Control de Velocidad -->
+        <div class="speed-control">
+          <div class="speed-header">
+            <span>Velocidad de Animación:</span>
+            <strong id="labelVelocidad">Rápida (10ms)</strong>
+          </div>
+          <div class="speed-buttons">
+            <button class="speed-btn" onclick="cambiarVelocidad(60, 'Lenta (60ms)', this)">Lenta</button>
+            <button class="speed-btn" onclick="cambiarVelocidad(25, 'Normal (25ms)', this)">Normal</button>
+            <button class="speed-btn active" onclick="cambiarVelocidad(10, 'Rápida (10ms)', this)">Rápida</button>
+          </div>
+        </div>
+
+        <!-- Acciones de Demostración -->
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button id="btnLimpiarDemo" class="btn btn-outline" onclick="limpiarDemostracion()" style="flex: 1;">
+            🧹 Limpiar
+          </button>
+          <button id="btnDetener" class="btn btn-danger" onclick="detenerAlgoritmo()" style="flex: 1;" disabled>
+            ⏹️ Detener
+          </button>
+        </div>
+
+        <!-- Métricas del Algoritmo -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-card-label">Celdas exploradas</span>
+            <div id="algoCeldas" class="metric-card-val">-</div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-card-label">Longitud del camino</span>
+            <div id="algoLongitud" class="metric-card-val">-</div>
+          </div>
+        </div>
+
+        <!-- Explicación Educativa -->
+        <div class="educational-box">
+          <span id="algoTag" class="algo-tag">Información</span>
+          <p id="algoDesc" class="algo-desc">
+            Selecciona un algoritmo arriba para observar visualmente cómo explora el laberinto y calcula la ruta hacia la meta.
+          </p>
+          <ul id="algoBullets" class="algo-bullets">
+            <li><strong>BFS:</strong> Explora por niveles con cola (FIFO). Encuentra la ruta más corta.</li>
+            <li><strong>DFS:</strong> Explora en profundidad con pila (LIFO) antes de retroceder.</li>
+            <li><strong>Dijkstra:</strong> Selecciona el camino de menor costo acumulado.</li>
+            <li><strong>Floyd-Warshall:</strong> Calcula rutas mínimas entre todos los pares mediante programación dinámica.</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Módulos de Javascript -->
+  <script src="js/laberinto.js"></script>
+  <script src="js/juego.js"></script>
+  <script src="js/bfs.js"></script>
+  <script src="js/dfs.js"></script>
+  <script src="js/dijkstra.js"></script>
+  <script src="js/floydWarshall.js"></script>
+  <script src="js/algoritmos.js"></script>
+
+  <script>
+    // Inicialización al cargar el documento
+    document.addEventListener('DOMContentLoaded', () => {
+      inicializarCanvas();
+      inicializarJuego();
+    });
+  </script>
+</body>
+</html>

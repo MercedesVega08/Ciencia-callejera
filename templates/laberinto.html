@@ -2,60 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Laberinto con Canvas</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #f0f0f0;
-      font-family: sans-serif;
-    }
-    canvas {
-      border: 3px solid #111;
-      background-color: #fff;
-      margin-top: 20px;
-    }
-
-    /* Estructura para dividir los botones en 50% y 50% */
-    .contenedor-botones {
-      display: flex;
-      width: 525px; /* Mismo ancho del canvas */
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .contenedor-botones button {
-      flex: 1; /* Ocupa la mitad exacta cada uno */
-      padding: 12px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      background-color: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-    }
-
-    .contenedor-botones button:hover {
-      background-color: #34495e;
-    }
-  </style>
+  <meta http-equiv="refresh" content="0; url=../index.html">
+  <title>Redirigiendo a Laberinto Interactivo...</title>
+  <script>
+    window.location.href = "../index.html";
+  </script>
 </head>
 <body>
-
-  <h1>¿Puedes vencer a la Computadora?</h1>
-  <canvas id="canvasLaberinto"></canvas>
-
-  <div class="contenedor-botones">
-    <button id="reinicio" type="button" onclick="reiniciar()">Reiniciar Laberinto</button>
-
-    <a href="dijkstra.html" style="flex: 1;">
-      <button id="solucion" type="button" style="width: 100%;">Dijkstra</button>
-    </a>
-  </div>
-
-  <!-- Cargas el módulo de JavaScript al final del body -->
-  <script src="./laberinto.js"></script>
+  <p>Redirigiendo al laberinto principal... <a href="../index.html">Haz clic aquí si no redirige automáticamente</a>.</p>
 </body>
 </html>
